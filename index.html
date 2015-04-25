@@ -20,11 +20,49 @@
        -moz-box-sizing: border-box;
             box-sizing: border-box;
   }
+
+  /* We just have one large heading. */
   h1 {
     margin: .67em 0;
     font-size: 2em;
   }
-  /* Typography inspired by atlas.oreilly.com */
+
+  /* This is the DOM structure we're using:
+        #container        Overall container
+          - svg#grid      Background grid
+          - div#tasks     Container for tasks
+              - div.task  Individual tasks
+   */
+  #container { position: relative; }
+  #tasks { overflow: hidden; }
+
+  .task {
+    position: absolute;
+    max-width: 15em;
+    min-width: 5em;
+    padding: 0.15em 0.25em;
+    background-color: #fff;
+    border: 1px solid #5b9bd5;
+    opacity: 0.95;
+    border-radius: 5px;
+  }
+  /* http://stackoverflow.com/a/12968143/100904 */
+  .task:before {
+    width: 50%;
+    position: absolute;
+    top: -10px;
+    left: -1px;
+    content: '';
+    border-top: 10px solid #5b9bd5;
+    cursor: move;
+  }
+  .task:focus, .task:hover {
+    z-index: 1;
+    opacity: 1;
+  }
+
+
+  /* Body text (help, mainly) uses this style. Typography inspired by atlas.oreilly.com */
   .copy {
     max-width: 690px;
     color: #333;
@@ -39,9 +77,17 @@
 
 <h1>Priority Matrix</h1>
 
-<svg id="container" width="920" height="559"><!-- 920 / 559 ~ Golden ratio -->
-  <rect id="background" width="100%" height="100%" fill="#eef"/>
-</svg>
+<div id="container">
+  <svg id="grid" width="920" height="559"><!-- 920 / 559 ~ Golden ratio -->
+    <rect id="background" width="100%" height="100%" fill="#eef"/>
+  </svg>
+  <div id="tasks">
+    <div class="task" style="left:30%;top:20%" contentEditable>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+    <div class="task" style="left:40%;top:30%" contentEditable>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+    <div class="task" style="left:10%;top:70%" contentEditable>Lorem ipsum dolor sit amet</div>
+    <div class="task" style="left:80%;top:70%" contentEditable>Lorem</div>
+  </div>
+</div>
 
 <div id="help" class="copy">
   <p>Sometimes, it’s hard to figure out what to do next.</p>
