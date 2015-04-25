@@ -29,7 +29,7 @@
 
   /* This is the DOM structure we're using:
         #container        Overall container
-          - svg#grid      Background grid
+          - svg.gridbase  Background grid
           - div#items     Container for items
               - div.item  Individual iteemes
    */
@@ -83,6 +83,15 @@
     border-color: #adadad;
   }
 
+  /* Grid styling */
+  #gridbase rect {
+    fill: #eee;
+  }
+  #grid path {
+    stroke: #ccc;
+    fill: none;
+  }
+
   /* Body text (help, mainly) uses this style. Typography inspired by atlas.oreilly.com */
   .copy {
     max-width: 690px;
@@ -102,8 +111,11 @@
 </h1>
 
 <div id="container">
-  <svg id="grid" width="920" height="559" ondragover="return false"><!-- 920 / 559 ~ Golden ratio -->
-    <rect id="background" width="100%" height="100%" fill="#eef"/>
+  <svg id="gridbase" width="920" height="559" ondragover="return false"><!-- 920 / 559 ~ Golden ratio -->
+    <rect width="100%" height="100%"/>
+    <g id="grid">
+      <path d="M0,0h100v100"/>
+    </g>
   </svg>
   <div id="items">
     <div draggable="true" class="item" style="left:270px;top:110px" contentEditable>Drag my handle: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
@@ -133,6 +145,16 @@ function on(event, className, handler) {
         && e.target.className.match(className))   // Though 'item' also matches 'items', we can afford to ignore that.
       return handler(e)
   }, false)
+}
+
+// Construct an SVG element. e.g. svg('path', {d: 'M10,10h100', stroke: '#000'})
+function svg(tag, attrs, text) {
+  var element = document.createElementNS('http://www.w3.org/2000/svg', tag)
+  for (var key in attrs)
+    element.setAttributeNS(null, key, attrs[key])
+  if (typeof text !== 'undefined')
+    element.appendChild(document.createTextNode(text))
+  return element
 }
 
 
@@ -165,5 +187,28 @@ document.getElementById('add-item').addEventListener('click', function(e) {
   item.style.top = '-10px'    // 10px above the #items container
   items.appendChild(item)
 })
+
+
+// draw_grid(columns, rows) draws a background grid
+var gridbase = document.getElementById('gridbase'),
+    grid = document.getElementById('grid'),
+    box = gridbase.getBBox(),
+    pad = 8
+function draw_grid(columns, rows) {
+  // Clear the grid
+  for (var nodes=grid.childNodes, i=nodes.length - 1; i >= 0; i--)
+    grid.removeChild(nodes[i])
+  // Draw the grid
+  for (var i=0, n=columns.length, w=box.width / n; i<n; i++) {
+    grid.appendChild(svg('path', {d: 'M' + i * w + ',0 v' + box.height}))
+    grid.appendChild(svg('text', {x: (i + .5) * w, y: box.height - pad, 'text-anchor': 'middle'}, columns[i]))
+  }
+  for (var i=0, n=rows.length, h=box.height / n; i<n; i++) {
+    y = (n - .5 - i) * h
+    grid.appendChild(svg('path', {d: 'M0,' + (y + h * .5) + ' h' + box.width}))
+    grid.appendChild(svg('text', {x: 0, y: y + pad, dy: '0.35em', 'text-anchor': 'middle', transform: 'rotate(-90,5,' + y + ')'}, rows[i]))
+  }
+}
+draw_grid(['Not urgent', 'OK', 'Urgent'], ['Not important', 'OK', 'Important'])
 </script>
 </body></html>
