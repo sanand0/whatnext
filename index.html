@@ -50,17 +50,23 @@
   .item:before {
     width: 50%;
     position: absolute;
-    top: -15px;
+    top: -5px;
     left: -1px;
     content: '';
-    border-top: 15px solid #5b9bd5;
+    border-top: 5px solid #5b9bd5;
     cursor: move;
   }
   .item:focus, .item:hover {
     z-index: 1;
     opacity: 1;
   }
-
+  .item:hover:before, .item:focus:before {
+    top: -20px;
+    border-top-width: 20px;
+  }
+  .item:focus:before {
+    border-top-color: #ed7d31;
+  }
 
   /* Button styling */
   .button {
