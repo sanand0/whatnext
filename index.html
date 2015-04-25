@@ -30,11 +30,11 @@
   /* This is the DOM structure we're using:
         #container        Overall container
           - svg#grid      Background grid
-          - div#tasks     Container for tasks
+          - div.tasks     Container for tasks
               - div.task  Individual tasks
    */
   #container { position: relative; }
-  #tasks { overflow: hidden; }
+  .tasks { overflow: hidden; }
 
   .task {
     position: absolute;
@@ -78,14 +78,14 @@
 <h1>Priority Matrix</h1>
 
 <div id="container">
-  <svg id="grid" width="920" height="559"><!-- 920 / 559 ~ Golden ratio -->
+  <svg id="grid" width="920" height="559" ondragover="return false"><!-- 920 / 559 ~ Golden ratio -->
     <rect id="background" width="100%" height="100%" fill="#eef"/>
   </svg>
-  <div id="tasks">
-    <div class="task" style="left:30%;top:20%" contentEditable>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-    <div class="task" style="left:40%;top:30%" contentEditable>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-    <div class="task" style="left:10%;top:70%" contentEditable>Lorem ipsum dolor sit amet</div>
-    <div class="task" style="left:80%;top:70%" contentEditable>Lorem</div>
+  <div class="tasks">
+    <div draggable="true" class="task" style="left:270px;top:110px" contentEditable>Drag my handle: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+    <div draggable="true" class="task" style="left:360px;top:170px" contentEditable>Drag my handle: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
+    <div draggable="true" class="task" style="left:100px;top:390px" contentEditable>Drag my handle: Lorem ipsum dolor sit amet</div>
+    <div draggable="true" class="task" style="left:720px;top:390px" contentEditable>Drag my handle</div>
   </div>
 </div>
 
@@ -98,4 +98,31 @@
      Everything’s saved in your browser and available the next time you visit. (But it won’t be available in other browsers or for other people.)</p>
 </div>
 
+<script>
+// A crude version of event delegation
+// All live events are bound to the container.
+// on('click', 'task', handler) runs handler if a ".task" is clicked.
+var container = document.getElementById('container')
+function on(event, className, handler) {
+  container.addEventListener(event, function(e) {
+    if (typeof e.target.className == 'string'     // SVG elements return an object for .className.
+        && e.target.className.match(className))   // Though 'task' also matches 'tasks', we can afford to ignore that.
+      return handler(e)
+  }, false)
+}
+
+var startX, startY
+on('dragstart', 'task', function(e) {
+  startX = e.screenX
+  startY = e.screenY
+  // Firefox won't trigger dragend without this.
+  // IE does not like text/plain -- only 'text'. http://stackoverflow.com/a/26660055/100904
+  e.dataTransfer.setData('text', '')
+})
+on('dragend', 'task', function(e) {
+  // I'd like to use clientX, but Firefox dragend sets clientX to 0. Using screenX instead
+  e.target.style.left = parseInt(e.target.style.left) + e.screenX - startX + 'px'
+  e.target.style.top = parseInt(e.target.style.top) + e.screenY - startY + 'px'
+})
+</script>
 </body></html>
