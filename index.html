@@ -1,6 +1,6 @@
 <!DOCTYPE html><html lang="en">
 <head>
-  <meta charset="utf8">
+  <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Priority Matrix</title>
   <style>
@@ -97,6 +97,12 @@
     stroke: #ccc;
     fill: none;
   }
+  .legend {
+    cursor: pointer;
+  }
+  .legend:hover {
+    fill: #ed7d31;
+  }
 
   /* Body text (help, mainly) uses this style. Typography inspired by atlas.oreilly.com */
   .copy {
@@ -122,6 +128,8 @@
     <g id="grid">
       <path d="M0,0h100v100"/>
     </g>
+    <text id="col:new" class="add-label legend" x="920" y="559" dx="-1em" dy="-8">+</text>
+    <text id="row:new" class="add-label legend" x="0" y="0" dx="8" dy="1em">+</text>
   </svg>
   <div id="items">
     <div draggable="true" class="item" style="left:270px;top:110px" contentEditable>Drag my handle: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
@@ -147,9 +155,11 @@
 var container = document.getElementById('container')
 function on(event, className, handler) {
   container.addEventListener(event, function(e) {
-    if (typeof e.target.className == 'string'     // SVG elements return an object for .className.
-        && e.target.className.match(className))   // Though 'item' also matches 'items', we can afford to ignore that.
-      return handler(e)
+    // SVG .className is an object with .baseVal and .animVal. HTML .className is a string
+    var cls = (typeof e.target.className == 'object' ? e.target.className.baseVal : e.target.className).split(/\s+/)
+    for (var i=0, l=cls.length; i<l; i++)
+      if (cls[i] == className)
+        return handler(e)
   }, false)
 }
 
@@ -195,26 +205,67 @@ document.getElementById('add-item').addEventListener('click', function(e) {
 })
 
 
-// draw_grid(columns, rows) draws a background grid
+// draw_grid() draws a background grid and label the grid
 var gridbase = document.getElementById('gridbase'),
     grid = document.getElementById('grid'),
     box = gridbase.getBBox(),
     pad = 8
-function draw_grid(columns, rows) {
+function draw_grid() {
   // Clear the grid
   for (var nodes=grid.childNodes, i=nodes.length - 1; i >= 0; i--)
     grid.removeChild(nodes[i])
   // Draw the grid
-  for (var i=0, n=columns.length, w=box.width / n; i<n; i++) {
+  for (var i=0, n=labels.col.length, w=box.width / n; i<n; i++) {
     grid.appendChild(svg('path', {d: 'M' + i * w + ',0 v' + box.height}))
-    grid.appendChild(svg('text', {x: (i + .5) * w, y: box.height - pad, 'text-anchor': 'middle'}, columns[i]))
+    grid.appendChild(svg('text', {id: 'col:' + i, 'class': 'label legend', x: (i + .5) * w, y: box.height - pad, 'text-anchor': 'middle'}, labels.col[i]))
   }
-  for (var i=0, n=rows.length, h=box.height / n; i<n; i++) {
+  for (var i=0, n=labels.row.length, h=box.height / n; i<n; i++) {
     y = (n - .5 - i) * h
     grid.appendChild(svg('path', {d: 'M0,' + (y + h * .5) + ' h' + box.width}))
-    grid.appendChild(svg('text', {x: 0, y: y + pad, dy: '0.35em', 'text-anchor': 'middle', transform: 'rotate(-90,5,' + y + ')'}, rows[i]))
+    grid.appendChild(svg('text', {id: 'row:' + i, 'class': 'label legend', x: 0, y: y + pad, dy: '0.35em', 'text-anchor': 'middle', transform: 'rotate(-90,5,' + y + ')'}, labels.row[i]))
   }
 }
-draw_grid(['Not urgent', 'OK', 'Urgent'], ['Not important', 'OK', 'Important'])
+
+// The data for the labels is here
+var labels = {
+  row: ['Grids', 'can be', 'Edited'],
+  col: ['Click', 'on', 'this label']
+}
+
+var strip = function(s) { return s.replace(/\s+/g, ' ').replace(/^ /, '').replace(/ $/, '') }
+
+// Clicking on any label lets you edit or delete it it
+on('click', 'label', function(e) {
+  var key = e.target.getAttributeNS(null, 'id').split(':'),
+      axis = key[0],
+      index = +key[1],
+      current_label = labels[axis][index],
+      new_label = prompt('Rename "' + current_label + '". (Or make it blank to delete)', current_label)
+  if (new_label !== null) {
+    new_label = strip(new_label)
+    if (new_label)
+      labels[axis][index] = new_label
+    else
+      labels[axis].splice(index, 1)
+    draw_grid()
+  }
+})
+
+// Clicking on the '+' icons lets you add a new row or column
+on('click', 'add-label', function(e) {
+  var key = e.target.getAttributeNS(null, 'id').split(':'),
+      axis = key[0],
+      new_label = prompt('Add ' + axis, 'Name')
+  if (new_label !== null) {
+    new_label = strip(new_label)
+    if (new_label) {
+      labels[axis].push(new_label)
+      draw_grid()
+    }
+  }
+})
+
+// Initialise with the default grid
+draw_grid()
 </script>
 </body></html>
