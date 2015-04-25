@@ -15,6 +15,8 @@ them around. You can pick your axis scales. Everything's saved in your
 browser and available the next time you visit. (But it won't be available
 in other browsers or for other people.)
 
+[Use the app](http://sanand0.github.io/whatnext/)
+
 Here's a screenshot
 
 ![Screenshot](img/screenshot.png)
