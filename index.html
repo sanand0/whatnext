@@ -231,7 +231,7 @@ document.getElementById('add-item').addEventListener('click', function(e) {
   add_item({
     x: this.getBoundingClientRect().left - document.body.getBoundingClientRect().left,
     y: -10,
-    y: 'New item'
+    t: 'New item'
   }).focus()
   save()
 })
