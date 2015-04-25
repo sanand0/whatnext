@@ -20,10 +20,9 @@
        -moz-box-sizing: border-box;
             box-sizing: border-box;
   }
-  .pull-right { float: right; }
 
-  /* We just have one large heading. */
   h1 {
+    font-family: Helvetica, Arial, sans-serif;
     margin: .67em 0;
     font-size: 2em;
   }
@@ -126,9 +125,6 @@
 <h1>
   Priority Matrix
   <button id="add-item" class='button'>New item</button>
-  <div class="pull-right">
-    <button id="save" class='button'>Save</button>
-  </div>
 </h1>
 
 <div id="container">
@@ -144,7 +140,8 @@
     <div draggable="true" class="item" style="left:270px;top:110px" contentEditable>Items can now be deleted. Just delete the text</div>
     <div draggable="true" class="item" style="left:360px;top:170px" contentEditable>Empty items will automatically vanish after 5 seconds</div>
     <div draggable="true" class="item" style="left:100px;top:390px" contentEditable>But in those 5 seconds, you can go back and undo the change</div>
-    <div draggable="true" class="item" style="left:720px;top:390px" contentEditable>Drag my handle</div>
+    <div draggable="true" class="item" style="left:600px;top:390px" contentEditable>Drag this item's handle to move it to a different location</div>
+    <div draggable="true" class="item" style="left:45px;top:180px" contentEditable>The state of the page is automatically saved in the browser, and restored when you load the page back</div>
   </div>
 </div>
 
@@ -155,6 +152,15 @@
   <p>This can be generalised. Almost anything can be prioritised on a grid.</p>
   <p>This page is an <strong>offline single-page app</strong> that lets you add things and move them around. You can pick your axis scales.
      Everything’s saved in your browser and available the next time you visit. (But it won’t be available in other browsers or for other people.)</p>
+
+  <h1>Usage</h1>
+  <ul>
+    <li><strong>Add an item</strong> by clicking on the “New item” button on top. You can edit and move the item around.</li>
+    <li><strong>Delete the item</strong> by delete the text in it. It will vanish in 5 seconds after it loses focus. (If you change your mind, click on the item and press <kbd>Ctrl-Z</kbd> to undo.)</li>
+    <li><strong>Edit labels</strong> by clicking on the labels at the left and bottom. To delete a label, edit it and make it blank. It will automatically be removed.</li>
+    <li><strong>Add labels</strong> by clicking on the “+” button at the top left or bottom right.</li>
+    <li>Your actions are automatically saved in your browser. Re-visit the page to continue from where you left off.</li>
+  </ul>
 </div>
 
 <script>
@@ -201,22 +207,33 @@ on('dragend', 'item', function(e) {
   // Firefox dragend sets clientX to 0. Using screenX instead
   e.target.style.left = parseInt(e.target.style.left) + e.screenX - startX + 'px'
   e.target.style.top = parseInt(e.target.style.top) + e.screenY - startY + 'px'
+  save()
 })
 
 
 // #add-item button adds a random item on the page
 var items = document.getElementById('items')
-document.getElementById('add-item').addEventListener('click', function(e) {
+
+function add_item(item_state) {
   var item = document.createElement('div')
-  item.appendChild(document.createTextNode('New item'))
+  item.appendChild(document.createTextNode(item_state.t))
   item.setAttribute('draggable', 'true')
   item.setAttribute('class', 'item')
   item.setAttribute('contentEditable', 'true')
-  // Add the item just below the new item button, making it easier to drag it
-  item.style.left = (this.getBoundingClientRect().left - document.body.getBoundingClientRect().left) + 'px'
-  item.style.top = '-10px'    // 10px above the #items container
+  item.style.left = item_state.x + 'px'
+  item.style.top = item_state.y + 'px'
   items.appendChild(item)
-  item.focus()
+  return item
+}
+
+document.getElementById('add-item').addEventListener('click', function(e) {
+  // Add the item just below the new item button, making it easier to drag it
+  add_item({
+    x: this.getBoundingClientRect().left - document.body.getBoundingClientRect().left,
+    y: -10,
+    y: 'New item'
+  }).focus()
+  save()
 })
 
 // If an item is left empty, schedule its deletion in a few seconds
@@ -226,14 +243,17 @@ on('focusout', 'item', function(e) {
       clearTimeout(e.target.timeout)
     e.target.timeout = setTimeout(function() {
       // Delete after a few seconds but only if it's still empty, and to be deleted
-      if (!e.target.textContent && e.target.classList.contains('to-be-deleted'))
+      if (!e.target.textContent && e.target.classList.contains('to-be-deleted')) {
         e.target.parentNode.removeChild(e.target)
+        save()
+      }
       else
         e.target.classList.remove('to-be-deleted')
       delete e.target.timeout
     }, 5000)
     e.target.classList.add('to-be-deleted')
-  }
+  } else
+    save()
 })
 
 on('focusin', 'item', function(e) {
@@ -259,12 +279,13 @@ function draw_grid() {
     grid.appendChild(svg('path', {d: 'M0,' + (y + h * .5) + ' h' + box.width}))
     grid.appendChild(svg('text', {id: 'row:' + i, 'class': 'label legend', x: 0, y: y + pad, dy: '0.35em', 'text-anchor': 'middle', transform: 'rotate(-90,5,' + y + ')'}, labels.row[i]))
   }
+  save()
 }
 
 // The data for the labels is here
 var labels = {
-  row: ['Grids', 'can be', 'Edited'],
-  col: ['Click', 'on', 'this label']
+  row: ['Urgent', 'Slightly urgent', 'Not urgent'],
+  col: ['Not important', 'Slightly important', 'Important']
 }
 
 // Clicking on any label lets you edit or delete it it
@@ -297,6 +318,37 @@ on('click', 'add-label', function(e) {
     }
   }
 })
+
+// The state of the application is computed by a simple JSON object
+function save() {
+  var items = []
+  for (var i=0, nodes=document.querySelectorAll('.item'), node; node=nodes[i]; i++)
+    items.push({
+      x: parseInt(node.style.left),
+      y: parseInt(node.style.top),
+      t: node.textContent
+    })
+  var state = {
+    item: items,
+    row: labels.row,
+    col: labels.col
+  }
+  localStorage['priority'] = JSON.stringify(state)
+}
+
+// Load the state from localStorage
+function load(state) {
+  labels.row = state.row
+  labels.col = state.col
+  for (var nodes=document.querySelectorAll('.item'), i=nodes.length - 1; i >= 0; i--)
+    items.removeChild(nodes[i])
+  for (var i=0, item_state; item_state=state.item[i]; i++) {
+    add_item(item_state)
+  }
+}
+
+if ('priority' in localStorage)
+  load(JSON.parse(localStorage['priority']))
 
 // Initialise with the default grid
 draw_grid()
