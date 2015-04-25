@@ -20,6 +20,9 @@
        -moz-box-sizing: border-box;
             box-sizing: border-box;
   }
+  .pull-right {
+    float: right;
+  }
 
   h1 {
     font-family: Helvetica, Arial, sans-serif;
@@ -88,6 +91,7 @@
     padding: 6px 12px;
     cursor: pointer;
     white-space: nowrap;
+    text-decoration: none;
   }
   .button:hover, .button:focus, .button:active {
     background-color: #ebebeb;
@@ -122,6 +126,10 @@
 <h1>
   Priority Matrix
   <button id="add-item" class='button'>New item</button>
+  <div class="pull-right">
+    <a href="https://github.com/sanand0/whatnext" target="_blank" class='button'>Source code</a>
+    <a href="https://github.com/sanand0/whatnext/issues/new" target="_blank" class="button">Report an issue</a>
+  </div>
 </h1>
 
 <div id="container">
