@@ -95,9 +95,6 @@
   }
 
   /* Grid styling */
-  #gridbase rect {
-    fill: #eee;
-  }
   #grid path {
     stroke: #ccc;
     fill: none;
@@ -129,10 +126,11 @@
 
 <div id="container">
   <svg id="gridbase" width="920" height="559" ondragover="return false"><!-- 920 / 559 ~ Golden ratio -->
-    <rect width="100%" height="100%"/>
-    <g id="grid">
-      <path d="M0,0h100v100"/>
-    </g>
+    <path d="M0,559 v-279.5 l460,279.5 z" fill="rgba(0,0,0,0)"/>
+    <path d="M0,279.5 v-279.5 l920,559 h-460 z" fill="rgba(0,0,0,.05)"/>
+    <path d="M0,0 h460 l460,279.5 v279.5 z" fill="rgba(0,0,0,.10)"/>
+    <path d="M460,0 h460 v279.5 z" fill="rgba(0,0,0,.15)"/>
+    <g id="grid"></g>
     <text id="col:new" class="add-label legend" x="920" y="559" dx="-1em" dy="-8">+</text>
     <text id="row:new" class="add-label legend" x="0" y="0" dx="8" dy="1em">+</text>
   </svg>
