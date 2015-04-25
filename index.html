@@ -332,7 +332,7 @@ function save() {
     items.push({
       x: parseInt(node.style.left),
       y: parseInt(node.style.top),
-      t: node.textContent
+      t: node.innerHTML
     })
   var state = {
     item: items,
