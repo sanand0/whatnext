@@ -20,6 +20,7 @@
        -moz-box-sizing: border-box;
             box-sizing: border-box;
   }
+  .pull-right { float: right; }
 
   /* We just have one large heading. */
   h1 {
@@ -58,7 +59,6 @@
   }
   .item:focus, .item:hover {
     z-index: 1;
-    opacity: 1;
   }
   .item:hover:before, .item:focus:before {
     top: -20px;
@@ -66,6 +66,12 @@
   }
   .item:focus:before {
     border-top-color: #ed7d31;
+  }
+  .to-be-deleted {
+    opacity: 0.5;
+  }
+  .to-be-deleted:before {
+
   }
 
   /* Button styling */
@@ -120,6 +126,9 @@
 <h1>
   Priority Matrix
   <button id="add-item" class='button'>New item</button>
+  <div class="pull-right">
+    <button id="save" class='button'>Save</button>
+  </div>
 </h1>
 
 <div id="container">
@@ -132,9 +141,9 @@
     <text id="row:new" class="add-label legend" x="0" y="0" dx="8" dy="1em">+</text>
   </svg>
   <div id="items">
-    <div draggable="true" class="item" style="left:270px;top:110px" contentEditable>Drag my handle: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-    <div draggable="true" class="item" style="left:360px;top:170px" contentEditable>Drag my handle: Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</div>
-    <div draggable="true" class="item" style="left:100px;top:390px" contentEditable>Drag my handle: Lorem ipsum dolor sit amet</div>
+    <div draggable="true" class="item" style="left:270px;top:110px" contentEditable>Items can now be deleted. Just delete the text</div>
+    <div draggable="true" class="item" style="left:360px;top:170px" contentEditable>Empty items will automatically vanish after 5 seconds</div>
+    <div draggable="true" class="item" style="left:100px;top:390px" contentEditable>But in those 5 seconds, you can go back and undo the change</div>
     <div draggable="true" class="item" style="left:720px;top:390px" contentEditable>Drag my handle</div>
   </div>
 </div>
@@ -173,6 +182,11 @@ function svg(tag, attrs, text) {
   return element
 }
 
+// Replace multiple whitespaces with a single space, and remove leading + trailing space
+function strip(s) {
+  return s.replace(/\s+/g, ' ').replace(/^ /, '').replace(/ $/, '')
+}
+
 
 // Make items draggable
 var startX, startY
@@ -202,8 +216,29 @@ document.getElementById('add-item').addEventListener('click', function(e) {
   item.style.left = (this.getBoundingClientRect().left - document.body.getBoundingClientRect().left) + 'px'
   item.style.top = '-10px'    // 10px above the #items container
   items.appendChild(item)
+  item.focus()
 })
 
+// If an item is left empty, schedule its deletion in a few seconds
+on('focusout', 'item', function(e) {
+  if (!e.target.textContent) {
+    if (e.target.timeout)
+      clearTimeout(e.target.timeout)
+    e.target.timeout = setTimeout(function() {
+      // Delete after a few seconds but only if it's still empty, and to be deleted
+      if (!e.target.textContent && e.target.classList.contains('to-be-deleted'))
+        e.target.parentNode.removeChild(e.target)
+      else
+        e.target.classList.remove('to-be-deleted')
+      delete e.target.timeout
+    }, 5000)
+    e.target.classList.add('to-be-deleted')
+  }
+})
+
+on('focusin', 'item', function(e) {
+  e.target.classList.remove('to-be-deleted')
+})
 
 // draw_grid() draws a background grid and label the grid
 var gridbase = document.getElementById('gridbase'),
@@ -231,8 +266,6 @@ var labels = {
   row: ['Grids', 'can be', 'Edited'],
   col: ['Click', 'on', 'this label']
 }
-
-var strip = function(s) { return s.replace(/\s+/g, ' ').replace(/^ /, '').replace(/ $/, '') }
 
 // Clicking on any label lets you edit or delete it it
 on('click', 'label', function(e) {
