@@ -24,10 +24,13 @@
     float: right;
   }
 
-  h1 {
+  h1, h2 {
     font-family: Helvetica, Arial, sans-serif;
     margin: .67em 0;
     font-size: 2em;
+  }
+  h2 {
+    font-size: 1.5em;
   }
 
   /* This is the DOM structure we're using:
@@ -72,9 +75,6 @@
   .to-be-deleted {
     opacity: 0.5;
   }
-  .to-be-deleted:before {
-
-  }
 
   /* Button styling */
   .button {
@@ -110,6 +110,12 @@
     fill: #ed7d31;
   }
 
+  /* Indicate editable content subtly */
+  [contenteditable]:hover, [contenteditable]:focus {
+    cursor: pointer;
+    color: #ed7d31
+  }
+
   /* Body text (help, mainly) uses this style. Typography inspired by atlas.oreilly.com */
   .copy {
     max-width: 690px;
@@ -120,13 +126,22 @@
     -webkit-font-smoothing: subpixel-antialiased;
     letter-spacing: .01em;
   }
+  #notes {
+    margin-top: 1em;
+    margin-bottom: 3em;
+  }
+
+  @media print {
+    h1 { margin: 0; }
+    .no-print { display: none; }
+  }
   </style>
 </head><body>
 
 <h1>
   <span id="app-name" class="app-name" contentEditable>Priority Matrix</span>
-  <button id="add-item" class='button'>New item</button>
-  <div class="pull-right">
+  <button id="add-item" class="button no-print">New item</button>
+  <div class="pull-right no-print">
     <select class="button" id="app-list-select">
       <optgroup label="Views" id="app-list"></optgroup>
       <optgroup label="Edit">
@@ -145,8 +160,8 @@
     <path d="M0,0 h460 l460,279.5 v279.5 z" fill="rgba(0,0,0,.10)"/>
     <path d="M460,0 h460 v279.5 z" fill="rgba(0,0,0,.15)"/>
     <g id="grid"></g>
-    <text id="col:new" class="add-label legend" x="920" y="559" dx="-1em" dy="-8">+</text>
-    <text id="row:new" class="add-label legend" x="0" y="0" dx="8" dy="1em">+</text>
+    <text id="col:new" class="add-label legend no-print" x="920" y="559" dx="-1em" dy="-8">+</text>
+    <text id="row:new" class="add-label legend no-print" x="0" y="0" dx="8" dy="1em">+</text>
   </svg>
   <div id="items">
     <div draggable="true" class="item" style="left:270px;top:110px" contentEditable>Items can now be deleted. Just delete the text</div>
@@ -158,7 +173,8 @@
 </div>
 
 <div id="notes" class="copy" contentEditable>Your notes here</div>
-<div id="help" class="copy">
+<div id="help" class="copy no-print">
+  <h2>Help</h2>
   <p>Sometimes, it’s hard to figure out what to do next.</p>
   <p>One classic approach is to list all your items, rate them on an urgency and importance scale, and pick those on the top right quadrant.
      Stephen Covey explains this in his book <a href="http://en.wikipedia.org/wiki/First_Things_First_(book)" target="_blank">First Things First</a>.</p>
@@ -166,7 +182,7 @@
   <p>This page is an <strong>offline single-page app</strong> that lets you add things and move them around. You can pick your axis scales.
      Everything’s saved in your browser and available the next time you visit. (But it won’t be available in other browsers or for other people.)</p>
 
-  <h1>Usage</h1>
+  <h2>Usage</h2>
   <ul>
     <li><strong>Add an item</strong> by clicking on the “New item” button on top. You can edit and move the item around.</li>
     <li><strong>Delete the item</strong> by delete the text in it. It will vanish in 5 seconds after it loses focus. (If you change your mind, click on the item and press <kbd>Ctrl-Z</kbd> to undo.)</li>
