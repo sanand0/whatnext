@@ -344,9 +344,8 @@ app_name_heading.addEventListener('focusout', function(e) {
 }, false)
 
 // Set the heading everywhere to name
-var app_name_nodes = document.querySelectorAll('.app-name')
 function set_heading(name) {
-  for (var i=0, node; node=app_name_nodes[i]; i++)
+  for (var i=0, nodes=document.querySelectorAll('.app-name'), node; node=nodes[i]; i++)
     node.textContent = name
 }
 
@@ -376,7 +375,7 @@ function save() {
 
 // Load the state from localStorage based on the URL hash
 function load(state) {
-  set_heading(state.name)
+  set_heading(state.name || 'Priority matrix')
   labels.row = state.row
   labels.col = state.col
   notes.innerHTML = state.notes || 'Your notes here'
@@ -398,8 +397,10 @@ function show_states() {
           option = document.createElement('option'),
           hash = app_id.replace(/^priority/, '')
       option.setAttribute('id', hash)
-      if (current_hash == hash)
+      if (current_hash == hash) {
         option.setAttribute('selected', 'selected')
+        option.setAttribute('class', 'app-name')
+      }
       option.appendChild(document.createTextNode(state.name))
       app_list.appendChild(option)
     }
