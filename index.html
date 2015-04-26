@@ -384,27 +384,39 @@ function load(state) {
   for (var i=0, item_state; item_state=state.item[i]; i++) {
     add_item(item_state)
   }
+  draw_grid()
 }
 
 var app_list_select = document.getElementById('app-list-select')
 var app_list = document.getElementById('app-list')
 function show_states() {
   clear(app_list)
-  var current_app_id = window.location.hash.replace(/^#/, '')
+  var current_hash = window.location.hash.replace(/^#/, '')
   for (var app_id in localStorage)
     if (app_id.match(/^priority/)) {
       var state = JSON.parse(localStorage[app_id]),
           option = document.createElement('option'),
-          id = app_id.replace(/^priority/, '')
-      option.setAttribute('id', id)
-      if (current_app_id == id)
+          hash = app_id.replace(/^priority/, '')
+      option.setAttribute('id', hash)
+      if (current_hash == hash)
         option.setAttribute('selected', 'selected')
       option.appendChild(document.createTextNode(state.name))
       app_list.appendChild(option)
     }
 }
 app_list_select.addEventListener('change', function(e) {
-  window.location.hash = app_list_select[app_list_select.selectedIndex].id
+  var hash = app_list_select[app_list_select.selectedIndex].id
+  if (hash == '_new_view') {
+    window.location.hash = Math.round(Math.random() * 1000)
+    set_heading('New view')
+    clear(items)
+  } else if (hash == '_clear_view') {
+    if (confirm('Delete this view without undo?')) {
+      delete localStorage['priority' + window.location.hash.replace(/^#/, '')]
+      window.location.hash = ''
+    }
+  } else
+    window.location.hash = hash
 })
 
 // When the URL hash changes, switch to a different view
@@ -416,8 +428,5 @@ function hashchange() {
 }
 window.addEventListener('hashchange', hashchange, false)
 hashchange()
-
-// Initialise with the default grid
-draw_grid()
 </script>
 </body></html>
