@@ -371,7 +371,7 @@ var notes = document.getElementById('notes')
 notes.addEventListener('focusout', save, false)
 
 // The state of the application is a JSON object
-function save() {
+function state() {
   var items = []
   for (var i=0, nodes=document.querySelectorAll('.item'), node; node=nodes[i]; i++)
     items.push({
@@ -379,15 +379,19 @@ function save() {
       y: parseInt(node.style.top),
       t: node.innerHTML
     })
-  var state = {
+  return {
     item: items,
     row: labels.row,
     col: labels.col,
     name: app_name_heading.textContent,
     notes: notes.innerHTML
   }
+}
+
+// Save the state in localStorage
+function save() {
   var app_id = 'priority' + window.location.hash.replace(/^#/, '')
-  localStorage[app_id] = JSON.stringify(state)
+  localStorage[app_id] = JSON.stringify(state())
 }
 
 // Load the state from localStorage based on the URL hash
