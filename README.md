@@ -33,7 +33,14 @@ Usage
 - **Edit labels** by clicking on the labels at the left and bottom. To delete
   a label, edit it and make it blank. It will automatically be removed.
 - **Add labels** by clicking on the "+" button at the top left or bottom right.
-- Your actions are automatically saved in your browser. Re-visit the page to continue from where you left off.
+- Your actions are automatically saved in your browser. Re-visit the page to
+  continue from where you left off.
+- **Change views** by selecting the dropdown at the top right. A view is like
+  a new clean slate. You can add or delete views.
+- **Publish** and **refresh** across machines by creating a free [Firebase
+  account](https://www.firebase.com/signup/) and entering a <code>.json</code>
+  URL. Or use this:
+  `https://whatnextapp.firebaseio.com/your-name/sheet-name.json`.
 
 
 License

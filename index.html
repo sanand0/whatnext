@@ -20,8 +20,17 @@
        -moz-box-sizing: border-box;
             box-sizing: border-box;
   }
+  /* Based on Bootstrap 3 */
   .pull-right {
     float: right;
+  }
+  a {
+    color: #428bca;
+    text-decoration: none;
+  }
+  a:hover, a:focus {
+    color: #2a6496;
+    text-decoration: underline;
   }
   code, kbd {
     font-family: Menlo,Monaco,Consolas,"Courier New",monospace;
@@ -111,6 +120,8 @@
     text-decoration: none;
   }
   .button:hover, .button:focus, .button:active {
+    color: #333;
+    text-decoration: none;
     background-color: #ebebeb;
     border-color: #adadad;
   }
@@ -137,6 +148,7 @@
     text-align: right;
     font-size: 75%;
     margin: 0.25em;
+    color: #888;
   }
   #publish-url:empty:after {
     content: "any Firebase.com .json URL";
@@ -219,8 +231,8 @@
     <li>Your actions are automatically saved in your browser. Re-visit the page to continue from where you left off.</li>
     <li><strong>Change views</strong> by selecting the dropdown at the top right. A view is like a new clean slate. You can add or delete views.</li>
     <li><strong>Publish</strong> and <strong>refresh from</strong> across machines by creating a free
-        <a href="https://www.firebase.com/signup/" target="_blank">Firebase account</a> and adding entering a <code>.json</code> URL.
-        Use this for example: <code>https://blistering-torch-5270.firebaseio.com/whatnext/sample.json</code>.
+        <a href="https://www.firebase.com/signup/" target="_blank">Firebase account</a> and entering a <code>.json</code> URL.
+        Or use this: <code>https://whatnextapp.firebaseio.com/your-name/sheet-name.json</code>.
   </ul>
 </div>
 
