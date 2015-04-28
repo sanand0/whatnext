@@ -442,6 +442,8 @@ function hashchange() {
   var app_id = 'priority' + window.location.hash.replace(/^#/, '')
   if (app_id in localStorage)
     load(JSON.parse(localStorage[app_id]))
+  else
+    draw_grid()
   show_states()
 }
 window.addEventListener('hashchange', hashchange, false)
