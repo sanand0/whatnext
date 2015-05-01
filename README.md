@@ -43,6 +43,14 @@ Usage
   `https://whatnextapp.firebaseio.com/your-name/sheet-name.json`.
 
 
+Technical tutorial
+------------------
+
+You can read this step-by-step [write-up on how this app was
+built](https://github.com/sanand0/whatnext/wiki) to understand the underlying
+technology.
+
+
 License
 -------
 
