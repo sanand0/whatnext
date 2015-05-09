@@ -74,7 +74,7 @@
     min-width: 5em;
     padding: 0.15em 0.25em;
     background-color: #fff;
-    border: 1px solid #5b9bd5;
+    border: 1px solid rgb(91, 155, 213);
     opacity: 0.95;
     border-radius: 5px;
   }
@@ -85,18 +85,18 @@
     top: -5px;
     left: -1px;
     content: '';
-    border-top: 5px solid #5b9bd5;
+    border-top-width: 5px;
+    border-top-style: solid;
+    border-top-color: inherit;
     cursor: move;
   }
   .item:focus, .item:hover {
     z-index: 1;
+    outline: none;
   }
   .item:hover:before, .item:focus:before {
     top: -20px;
     border-top-width: 20px;
-  }
-  .item:focus:before {
-    border-top-color: #ed7d31;
   }
   .to-be-deleted {
     opacity: 0.5;
@@ -228,6 +228,7 @@
     <li><strong>Delete the item</strong> by delete the text in it. It will vanish in 5 seconds after it loses focus. (If you change your mind, click on the item and press <kbd>Ctrl-Z</kbd> to undo.)</li>
     <li><strong>Edit labels</strong> by clicking on the labels at the left and bottom. To delete a label, edit it and make it blank. It will automatically be removed.</li>
     <li><strong>Add labels</strong> by clicking on the “+” button at the top left or bottom right.</li>
+    <li><strong>Change label colour</strong> by pressing Ctrl-click. The item cycles through 5 different colours.</li>
     <li>Your actions are automatically saved in your browser. Re-visit the page to continue from where you left off.</li>
     <li><strong>Change views</strong> by selecting the dropdown at the top right. A view is like a new clean slate. You can add or delete views.</li>
     <li><strong>Publish</strong> and <strong>refresh from</strong> across machines by creating a free
@@ -301,6 +302,7 @@ function add_item(item_state) {
   item.style.left = item_state.x + 'px'
   item.style.top = item_state.y + 'px'
   item.innerHTML = item_state.t
+  item.style.borderColor = item_state.c
   items.appendChild(item)
   return item
 }
@@ -424,6 +426,16 @@ on('click', 'add-label', function(e) {
   }
 })
 
+// Shift-click on an item to cycle through colors. Office 2013 palette in rgb() since that is what getComputedStyle returns
+var colors = ['rgb(91, 155, 213)', 'rgb(237, 125, 49)', 'rgb(165, 165, 165)', 'rgb(255, 192, 0)', 'rgb(112, 173, 71)']
+on('click', 'item', function(e) {
+  if (e.ctrlKey) {
+    var index = colors.indexOf(getComputedStyle(e.target)['border-top-color'])
+    e.target.style.borderColor = colors[index < 0 ? 1 : (index + 1) % colors.length]
+    save()
+  }
+})
+
 // When heading changes, apply the heading everywhere (h1 and title) and save it
 var app_name_heading = document.getElementById('app-name')
 app_name_heading.addEventListener('focusout', function(e) {
@@ -448,7 +460,8 @@ function state() {
     items.push({
       x: parseInt(node.style.left),
       y: parseInt(node.style.top),
-      t: node.innerHTML
+      t: node.innerHTML,
+      c: getComputedStyle(node)['border-top-color']
     })
   return {
     item: items,
